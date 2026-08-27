@@ -27,10 +27,24 @@ class SensorModule {
         void waiting_client() {
             acceptor_.async_accept([this](boost::system::error_code ec, tcp::socket socket) {
                 if (!ec) {
+                    // 1. On lit l'IP AVANT de déplacer la socket
+                    boost::system::error_code ec_ip;
+                    auto endpoint = socket.remote_endpoint(ec_ip);
+                    
+                    if (!ec_ip) {
+                        std::cout << "[Serveur] Nouvelle connexion de : " << endpoint.address().to_string() << std::endl;
+                    }
+
+                    // 2. MAINTENANT on donne la socket au capteur
                     std::shared_ptr<SensorSocket> new_sensor = std::make_shared<Movement>(std::move(socket), req_bus_, req_mutex_);
-                    sensor.insert({sensor.size(), new_sensor} );
+                    new_sensor->start_listening();
+                    sensor.insert({sensor.size(), new_sensor});
+                    
+                    // (Optionnel : N'oublie pas d'appeler la fonction qui lance la lecture asynchrone si tu en as une, ex: new_sensor->demarrer_ecoute(); )
+
+                    // 3. On attend le prochain client
                     this->waiting_client();
                 }
             });
-        }
+        };
 };
