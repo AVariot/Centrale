@@ -26,4 +26,7 @@ run: $(TARGET)
 clean:
 	rm -rf $(BUILDDIR) $(TARGET)
 
+fclean: clean
+	rm -rf log/*
+
 re: clean all

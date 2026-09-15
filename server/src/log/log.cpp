@@ -80,7 +80,7 @@ void Log::write_loop() {
             write_queue.pop();
             lock.unlock();
 
-            log_file << entry.id << ";" << entry.target << ";" << entry.body << std::endl;
+            log_file << "[" << entry.id << "]" << "[" << entry.target << "]: " << entry.body << std::endl;
 
             lock.lock();
         }

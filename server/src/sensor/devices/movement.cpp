@@ -8,11 +8,11 @@ std::string Movement::parser(const std::string& raw_data) {
 
     std::cout << "MOVEMENT DATA: " << cleaned_data << std::endl;
 
-    if (cleaned_data == "1") {
-        return "ACTION:ARRIVEE";
+    if (cleaned_data.compare("1")) {
+        return "ACTION:IN";
     } 
-    else if (cleaned_data == "-1") {
-        return "ACTION:DEPART";
+    else if (cleaned_data.compare("-1")) {
+        return "ACTION:OUT";
     }
     else {
         return "ACTION:INCONNU_OU_ERREUR";
