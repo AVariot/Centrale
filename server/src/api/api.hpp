@@ -15,7 +15,7 @@ namespace http = boost::beast::http;
 
 class Api {
     public:
-        Api(net::io_context& ioc, short port, std::queue<DataBus>& req_bus, std::mutex& req_mutex);
+        Api(net::io_context& ioc, short port, std::queue<DataBus>& req_bus, std::mutex& req_mutex, std::queue<DataBus>& res_bus, std::mutex& res_mutex);
         void run();
 
     private:
@@ -26,4 +26,6 @@ class Api {
         tcp::acceptor acceptor_;
         std::queue<DataBus>& req_bus_;
         std::mutex& req_mutex_;
+        std::queue<DataBus>& res_bus_;
+        std::mutex& res_mutex_;
 };

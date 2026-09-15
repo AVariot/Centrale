@@ -26,7 +26,7 @@ namespace {
 Centrale::Centrale() {
     std::cout << "Centrale initialing" << std::endl;
     log_ptr = std::make_unique<Log>();
-    api_ptr = std::make_unique<Api>(io_context_api, 9001, req_bus, req_bus_mutex);
+    api_ptr = std::make_unique<Api>(io_context_api, 9001, req_bus, req_bus_mutex, res_bus, res_bus_mutex);
     sensor_ptr = std::make_unique<SensorModule>(io_context_sensor, 9000, req_bus, req_bus_mutex);
 
     std::string pc_ip = env_or("PC_IP", "192.168.1.100");
@@ -102,7 +102,11 @@ void Centrale::run() {
             }
 
             if (!command_found) {
-                log_ptr->insert_log(DataBus{request.id, "Error:", "Command not found: " + request.body});
+                {
+                    std::lock_guard<std::mutex> lock(res_bus_mutex);
+                    this->res_bus.push({"API", "mobile", "Error: command not found"});
+                }
+                log_ptr->insert_log(DataBus{request.id, "mobile", "Error: Command not found: " + request.body});
             }
 
             // if (request.body == "ACTION:IN") {
