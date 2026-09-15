@@ -47,4 +47,5 @@ class Centrale {
 
         void move_command(std::string input, std::string request_id);
         void lux_command(std::string input, std::string request_id);
+        void log_command(std::string input, std::string request_id);
 };

@@ -51,6 +51,21 @@ Log::~Log() {
     }
 }
 
+std::string Log::get_log() {
+    std::string res;
+
+    for (const auto& dt : log_memory_trace) {
+        res = res + data_bus_stringify(dt);
+    }
+
+    return res;
+}
+
+std::string Log::data_bus_stringify(DataBus dtbs) {
+    return "[" + dtbs.id + "][" + dtbs.target + "]: " + dtbs.body;
+}
+
+
 void Log::insert_log(DataBus data_to_log) {
     log_memory_trace.push_front(data_to_log);
 

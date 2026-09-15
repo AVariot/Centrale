@@ -3,7 +3,6 @@
 
 #include <cstdlib>
 
-//FIXME: iomplement api ina thread with data bus req et res
 
 namespace {
     std::string env_or(const char* name, const std::string& default_value) {
@@ -39,6 +38,9 @@ Centrale::Centrale() {
     command["LUX"] = [this](std::string input, std::string request_id) {
         this->lux_command(input, request_id);
     };
+    command["LOG"] = [this](std::string input, std::string request_id) {
+        this->log_command(input, request_id);
+    };
 }
 
 void Centrale::move_command(std::string input, std::string request_id) {
@@ -55,6 +57,16 @@ void Centrale::move_command(std::string input, std::string request_id) {
 }
 
 void Centrale::lux_command(std::string input, std::string request_id) {
+}
+void Centrale::log_command(std::string input, std::string request_id) {
+    std::string les_logs = log_ptr->get_log();
+
+    {
+        std::lock_guard<std::mutex> lock(res_bus_mutex);
+        this->res_bus.push({"API", "mobile", les_logs});
+    }
+    
+    log_ptr->insert_log(DataBus{request_id, "mobile", "Success: Logs sent to API"});
 }
 
 void Centrale::run() {
@@ -93,6 +105,8 @@ void Centrale::run() {
             bool command_found = false;
 
             for (const auto& [key, func] : command) {
+                std::cout << key << std::endl;
+                std::cout << request.body << std::endl;
                 if (request.body.find(key) != std::string::npos) {
                     log_ptr->insert_log(DataBus{request.id, "Success:", "Command found: " + request.body});
                     func(request.body, request.id);
@@ -108,12 +122,6 @@ void Centrale::run() {
                 }
                 log_ptr->insert_log(DataBus{request.id, "mobile", "Error: Command not found: " + request.body});
             }
-
-            // if (request.body == "ACTION:IN") {
-            //     std::string result = wol->executer("wake");
-            //     std::cout << "[Centrale] WOL result: " << result << std::endl;
-            //     log_ptr->insert_log(DataBus{request.id, "wol", result});
-            // }
         }
     }
 }

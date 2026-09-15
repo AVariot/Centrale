@@ -16,6 +16,7 @@ class Log {
         Log();
         ~Log();
         void insert_log(DataBus data_to_log);
+        std::string get_log();
 
     private:
         void write_loop();
@@ -29,4 +30,5 @@ class Log {
         std::condition_variable write_cv;
         std::atomic<bool> stop_thread;
         std::thread write_thread;
+        std::string data_bus_stringify(DataBus dtbs);
 };
